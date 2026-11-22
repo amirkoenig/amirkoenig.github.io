@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300..800&family=Cutive+Mono&family=Instrument+Serif:ital@0;1&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&display=swap">
-  <link rel="stylesheet" href="assets/site.css">
+  <link rel="stylesheet" href="assets/site.css?v=2">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -57,7 +57,6 @@
 
       <!-- EWS: a phone on a plate, lock screen with an alert and a live radar -->
       <symbol id="art-ews" viewBox="0 0 600 560">
-        <use href="#plate"/>
         <ellipse cx="300" cy="482" rx="104" ry="11" fill="#000" opacity=".28" filter="url(#softer)"/>
         <g transform="rotate(-4 300 300)">
           <rect x="198" y="66" width="204" height="414" rx="40" fill="#151518"/>
@@ -94,7 +93,6 @@
 
       <!-- Gitbox: a blue box with a padlock and a "verified" tag -->
       <symbol id="art-gitbox" viewBox="0 0 600 560">
-        <use href="#plate"/>
         <ellipse cx="300" cy="474" rx="150" ry="16" fill="#000" opacity=".3" filter="url(#softer)"/>
         <path d="M300 168 L444 240 L300 312 L156 240 Z" fill="url(#boxTop)"/>
         <path d="M156 240 L300 312 L300 466 L156 394 Z" fill="url(#boxLeft)"/>
@@ -135,7 +133,6 @@
 
       <!-- Margin: a tablet with a margin note and a pencil -->
       <symbol id="art-margin" viewBox="0 0 600 560">
-        <use href="#plate"/>
         <ellipse cx="300" cy="474" rx="170" ry="13" fill="#000" opacity=".28" filter="url(#softer)"/>
         <g transform="rotate(-3 300 340)">
           <path d="M250 455 L300 300 L350 455 Z" fill="#9d978e"/>
@@ -202,10 +199,11 @@
 
   <nav class="rail" aria-label="Sections"></nav>
   <div class="cursor" aria-hidden="true"></div>
+  <div class="backdrop" aria-hidden="true"></div>
 
   <main>
     <!-- [0] Hero -->
-    <section class="hero" id="top" data-tone="light" data-label="" data-name="top">
+    <section class="hero" id="top" data-bg="#0f0f0e" data-tone="light" data-label="" data-name="top">
       <canvas class="sky" data-base=".67" data-sun=".42" aria-hidden="true"></canvas>
       <div class="hero-head">
         <p class="eyebrow">Computer Science · ETH Zurich</p>
@@ -226,7 +224,7 @@
     </section>
 
     <!-- [1] Hello -->
-    <section class="pin field field-klein" id="hello" data-tone="light" data-label="hello" data-name="Introduction" data-hash="##">
+    <section class="pin field field-klein" id="hello" data-bg="#1d3fbf" data-tone="light" data-label="hello" data-name="Introduction" data-hash="##">
       <div class="pin-stage">
         <p class="md-h"><span class="hash">##</span> hello</p>
         <h2 class="hello-big">Hello<span class="dot">.</span></h2>
@@ -235,7 +233,7 @@
     </section>
 
     <!-- [2] Projects -->
-    <section class="reading" id="projects" data-tone="dark" data-label="projects" data-name="Projects" data-hash="##">
+    <section class="reading" id="projects" data-bg="#faf9f5" data-tone="dark" data-label="projects" data-name="Projects" data-hash="##">
       <div class="col">
         <p class="eyebrow-n rv"><span class="num">[2]</span> Projects</p>
         <h2 class="rv">Three products, built in 2026</h2>
@@ -244,7 +242,9 @@
       </div>
     </section>
 
-    <section class="field project" id="ews" style="--bg: var(--sky)" data-tone="dark" data-label="1. EWS" data-name="EWS" data-hash="###">
+    <div class="stage" id="stage">
+      <div class="stage-sticky">
+    <section class="field project" id="ews" data-bg="#74a9d0" style="--bg: var(--sky)" data-tone="dark" data-label="1. EWS" data-name="EWS" data-hash="###">
       <div class="project-inner">
         <div class="project-text">
           <p class="md-h rv"><span class="hash">###</span> 1. the early-warning app</p>
@@ -258,12 +258,13 @@
           </ul>
         </div>
         <figure class="project-art rv">
-          <svg viewBox="0 0 600 560" role="img" aria-label="A phone on a plate showing an EWS alert and a live radar"><use href="#art-ews"/></svg>
+          <svg class="plate-svg" viewBox="0 0 600 560" aria-hidden="true"><use href="#plate"/><g class="rim"></g></svg>
+          <div class="obj"><svg viewBox="0 0 600 560" role="img" aria-label="A phone on a plate showing an EWS alert and a live radar"><use href="#art-ews"/></svg></div>
         </figure>
       </div>
     </section>
 
-    <section class="field project flip" id="gitbox" style="--bg: var(--lilac)" data-tone="dark" data-label="2. Gitbox" data-name="Gitbox" data-hash="###">
+    <section class="field project flip" id="gitbox" data-bg="#c8b1f2" style="--bg: var(--lilac)" data-tone="dark" data-label="2. Gitbox" data-name="Gitbox" data-hash="###">
       <div class="project-inner">
         <div class="project-text">
           <p class="md-h rv"><span class="hash">###</span> 2. the private code platform</p>
@@ -277,12 +278,13 @@
           </ul>
         </div>
         <figure class="project-art rv">
-          <svg viewBox="0 0 600 560" role="img" aria-label="A blue box with a gold padlock and a tag that reads verified"><use href="#art-gitbox"/></svg>
+          <svg class="plate-svg" viewBox="0 0 600 560" aria-hidden="true"><use href="#plate"/></svg>
+          <div class="obj"><svg viewBox="0 0 600 560" role="img" aria-label="A blue box with a gold padlock and a tag that reads verified"><use href="#art-gitbox"/></svg></div>
         </figure>
       </div>
     </section>
 
-    <section class="field project" id="margin" style="--bg: var(--olive)" data-tone="dark" data-label="3. Margin" data-name="Margin" data-hash="###">
+    <section class="field project" id="margin" data-bg="#aec18c" style="--bg: var(--olive)" data-tone="dark" data-label="3. Margin" data-name="Margin" data-hash="###">
       <div class="project-inner">
         <div class="project-text">
           <p class="md-h rv"><span class="hash">###</span> 3. the study app</p>
@@ -296,13 +298,17 @@
           </ul>
         </div>
         <figure class="project-art rv">
-          <svg viewBox="0 0 600 560" role="img" aria-label="A tablet with a note in the margin asking: what would you try first?"><use href="#art-margin"/></svg>
+          <svg class="plate-svg" viewBox="0 0 600 560" aria-hidden="true"><use href="#plate"/></svg>
+          <div class="obj"><svg viewBox="0 0 600 560" role="img" aria-label="A tablet with a note in the margin asking: what would you try first?"><use href="#art-margin"/></svg></div>
         </figure>
       </div>
     </section>
 
+      </div>
+    </div>
+
     <!-- [3] Record -->
-    <section class="reading" id="record" data-tone="dark" data-label="record" data-name="Record" data-hash="##">
+    <section class="reading" id="record" data-bg="#faf9f5" data-tone="dark" data-label="record" data-name="Record" data-hash="##">
       <div class="col">
         <p class="eyebrow-n rv"><span class="num">[3]</span> Record</p>
         <h2 class="rv">Education and experience</h2>
@@ -345,10 +351,10 @@
     </section>
 
     <!-- [4] Leadership -->
-    <section class="field lead-scene" id="leadership" style="--bg: var(--pink)" data-tone="dark" data-label="leadership" data-name="Leadership" data-hash="##">
+    <section class="field lead-scene" id="leadership" data-bg="#ffb3cd" style="--bg: var(--pink)" data-tone="dark" data-label="leadership" data-name="Leadership" data-hash="##">
       <div class="lead-inner">
         <p class="md-h rv"><span class="hash">##</span> leadership</p>
-        <p class="giant rv" aria-label="400 plus">400<span class="plus">+</span></p>
+        <p class="giant rv" aria-label="400 plus"><span class="count" aria-hidden="true">400</span><span class="plus" aria-hidden="true">+</span></p>
         <p class="giant-cap rv">students represented as Student Government President. <em>Plus six years as Class President.</em></p>
         <ul class="strips">
           <li class="rv">Took digital learning from a one-class pilot to the entire primary school</li>
@@ -363,7 +369,7 @@
     </section>
 
     <!-- [5] Toolbox -->
-    <section class="field toolbox" id="toolbox" style="--bg: var(--cream)" data-tone="dark" data-label="toolbox" data-name="Toolbox" data-hash="##">
+    <section class="field toolbox" id="toolbox" data-bg="#f4efe8" style="--bg: var(--cream)" data-tone="dark" data-label="toolbox" data-name="Toolbox" data-hash="##">
       <div class="tool-inner">
         <p class="md-h rv"><span class="hash">##</span> toolbox</p>
         <ul class="dash-list">
@@ -383,7 +389,7 @@
     </section>
 
     <!-- [6] Availability -->
-    <section class="outro" id="contact" data-tone="light" data-label="availability" data-name="Availability" data-hash="##">
+    <section class="outro" id="contact" data-bg="#0f0f0e" data-tone="light" data-label="availability" data-name="Availability" data-hash="##">
       <canvas class="sky" data-base=".86" data-sun=".7" data-variant="dusk" aria-hidden="true"></canvas>
       <div class="outro-copy">
         <p class="eyebrow-n rv"><span class="num">[6]</span> Availability</p>
@@ -404,9 +410,9 @@
   <div class="index" id="index" role="dialog" aria-modal="true" aria-label="Index" hidden>
     <ol class="cards">
       <li><a href="#hello" style="--r:-5deg"><span class="card-art" style="--c:var(--klein)"><span class="mini-hello">Hello<i>.</i></span></span><span class="n">1</span><span class="t">hello</span></a></li>
-      <li><a href="#ews" style="--r:3deg"><span class="card-art" style="--c:var(--sky)"><svg viewBox="60 40 480 500" aria-hidden="true"><use href="#art-ews"/></svg></span><span class="n">2</span><span class="t">EWS</span></a></li>
-      <li><a href="#gitbox" style="--r:-2deg"><span class="card-art" style="--c:var(--lilac)"><svg viewBox="60 60 480 480" aria-hidden="true"><use href="#art-gitbox"/></svg></span><span class="n">3</span><span class="t">Gitbox</span></a></li>
-      <li><a href="#margin" style="--r:4deg"><span class="card-art" style="--c:var(--olive)"><svg viewBox="60 100 480 440" aria-hidden="true"><use href="#art-margin"/></svg></span><span class="n">4</span><span class="t">Margin</span></a></li>
+      <li><a href="#ews" style="--r:3deg"><span class="card-art" style="--c:var(--sky)"><svg viewBox="60 40 480 500" aria-hidden="true"><use href="#plate"/><use href="#art-ews"/></svg></span><span class="n">2</span><span class="t">EWS</span></a></li>
+      <li><a href="#gitbox" style="--r:-2deg"><span class="card-art" style="--c:var(--lilac)"><svg viewBox="60 60 480 480" aria-hidden="true"><use href="#plate"/><use href="#art-gitbox"/></svg></span><span class="n">3</span><span class="t">Gitbox</span></a></li>
+      <li><a href="#margin" style="--r:4deg"><span class="card-art" style="--c:var(--olive)"><svg viewBox="60 100 480 440" aria-hidden="true"><use href="#plate"/><use href="#art-margin"/></svg></span><span class="n">4</span><span class="t">Margin</span></a></li>
       <li><a href="#record" style="--r:-3deg"><span class="card-art" style="--c:var(--ivory)"><span class="mini-table"><i></i><i></i><i></i><i></i></span></span><span class="n">5</span><span class="t">record</span></a></li>
       <li><a href="#leadership" style="--r:2deg"><span class="card-art" style="--c:var(--pink)"><span class="mini-400">400+</span></span><span class="n">6</span><span class="t">leadership</span></a></li>
       <li><a href="#toolbox" style="--r:-4deg"><span class="card-art" style="--c:var(--cream)"><span class="mini-hallo">Hallo</span></span><span class="n">7</span><span class="t">toolbox</span></a></li>
@@ -414,6 +420,6 @@
     </ol>
   </div>
 
-  <script src="assets/site.js" defer></script>
+  <script src="assets/site.js?v=2" defer></script>
 </body>
 </html>

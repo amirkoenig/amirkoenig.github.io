@@ -123,7 +123,11 @@
       const rise = reduce ? 1 : 1 - Math.pow(1 - clamp(t / 3.2), 3);
       const sx = W * sunU + px * 16;
       const base = ridgeY(W * sunU);
-      const sy = base + (dusk ? 6 : (1 - rise) * 46 - 4) + py * 6;
+      // canvas._p is set by the scroll engine: hero = how far it has scrolled away, outro = how far it has arrived
+      const sp = canvas._p || 0;
+      const sy = dusk
+        ? base + 6 + (1 - sp) * 70 + py * 6
+        : base + (1 - rise) * 46 - 4 - sp * H * .16 + py * 6;
       const flick = .92 + .08 * Math.sin(t * 2.3) * Math.sin(t * 1.1 + 1);
       const R = Math.min(W, H);
 
@@ -146,7 +150,7 @@
 
       // starburst over everything
       ctx.globalCompositeOperation = 'lighter';
-      const k = (.55 + .45 * rise) * flick;
+      const k = (.55 + .45 * rise) * flick * (dusk ? .35 + .65 * sp : 1 + sp * .35);
       for (const r of rays) {
         const a = r.a + t * .015;
         const len = r.len * rs * (.8 + .2 * Math.sin(t * r.f + r.a * 3)) * k;
@@ -201,6 +205,7 @@
   }
   $$('canvas.sky').forEach((c) => { try { Sky(c); } catch (e) { /* the page still reads fine without the sky */ } });
 
+
   /* ---------------------------------------------------------------- Split "data-words" paragraphs into word spans */
   $$('[data-words]').forEach((el) => {
     const walk = (node) => {
@@ -219,25 +224,6 @@
     walk(el);
   });
 
-  /* ---------------------------------------------------------------- Pinned scenes: progress 0..1 while the stage is stuck */
-  const pins = $$('.pin');
-  function updatePins() {
-    for (const p of pins) {
-      const r = p.getBoundingClientRect();
-      const total = r.height - innerHeight;
-      const prog = total > 0 ? clamp(-r.top / total) : 1;
-      p.style.setProperty('--p', prog.toFixed(4));
-      const words = p._words || (p._words = $$('.w', p));
-      const shown = reduce ? words.length : Math.round(clamp((prog - .06) / .7) * words.length);
-      words.forEach((w, i) => w.classList.toggle('on', i < shown));
-    }
-  }
-  let ticking = false;
-  const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(() => { updatePins(); ticking = false; }); } };
-  window.addEventListener('scroll', onScroll, { passive: true });
-  window.addEventListener('resize', onScroll);
-  updatePins();
-
   /* ---------------------------------------------------------------- Reveal on enter, with a small stagger per group */
   const groups = new Map();
   $$('.rv').forEach((el) => {
@@ -255,14 +241,206 @@
     $$('.rv').forEach((el) => el.classList.add('in'));
   }
 
-  /* ---------------------------------------------------------------- HUD: current section label, text tone, left rail */
+  /* ---------------------------------------------------------------- Colour maths: blend in OKLab so blue to ivory stays clean */
+  const hexRgb = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16) / 255);
+  const lin = (c) => (c <= .04045 ? c / 12.92 : Math.pow((c + .055) / 1.055, 2.4));
+  const delin = (c) => (c <= .0031308 ? 12.92 * c : 1.055 * Math.pow(c, 1 / 2.4) - .055);
+  function toOk(hex) {
+    const [r, g, b] = hexRgb(hex).map(lin);
+    const l = Math.cbrt(.4122214708 * r + .5363325363 * g + .0514459929 * b);
+    const m = Math.cbrt(.2119034982 * r + .6806995451 * g + .1073969566 * b);
+    const s = Math.cbrt(.0883024619 * r + .2817188376 * g + .6299787005 * b);
+    return [.2104542553 * l + .7936177850 * m - .0040720468 * s, 1.9779984951 * l - 2.4285922050 * m + .4505937099 * s, .0259040371 * l + .7827717662 * m - .8086757660 * s];
+  }
+  function fromOk([L, a, b]) {
+    const l = (L + .3963377774 * a + .2158037573 * b) ** 3;
+    const m = (L - .1055613458 * a - .0638541728 * b) ** 3;
+    const s = (L - .0894841775 * a - 1.2914855480 * b) ** 3;
+    const lr = [4.0767416621 * l - 3.3077115913 * m + .2309699292 * s, -1.2684380046 * l + 2.6097574011 * m - .3413193965 * s, -.0041960863 * l - .7034186147 * m + 1.7076147010 * s].map((c) => clamp(c));
+    return { rgb: lr.map((c) => Math.round(delin(c) * 255)), lum: .2126 * lr[0] + .7152 * lr[1] + .0722 * lr[2] };
+  }
+  const mix = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
+  const mixN = (cols, f) => { const i = clamp(Math.floor(f), 0, cols.length - 1); return mix(cols[i], cols[Math.min(i + 1, cols.length - 1)], clamp(f - i)); };
+  const sstep = (t) => { t = clamp(t); return t * t * (3 - 2 * t); };
+  const eOut = (t) => 1 - Math.pow(1 - clamp(t), 3);
+  const eIn = (t) => Math.pow(clamp(t), 2);
+  const eInOut = (t) => { t = clamp(t); return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; };
+
+  /* ---------------------------------------------------------------- The scroll engine.
+     Everything that moves with scroll reads one smoothed scroll value, so wheel steps glide. */
+  const root = document.documentElement;
+  const backdrop = $('.backdrop');
   const hud = $('.hud');
   const hudFile = $('.hud-file');
   const hudHash = $('.hud-hash');
   const hudLabel = $('.hud-label');
   const rail = $('.rail');
-  const sections = $$('main > section');
-  const ticks = sections.map((s) => {
+  const hero = $('#top'), hello = $('#hello'), intro = $('#projects'), stage = $('#stage'), contact = $('#contact');
+  const projects = $$('.stage .project');
+  const heroSky = $('.hero .sky'), outroSky = $('.outro .sky');
+  const words = $$('.w', hello);
+  const stageMQ = matchMedia('(min-width: 900px) and (min-height: 620px)');
+  const HOLD = 1, TRANS = .85, UNITS = projects.length * HOLD + (projects.length - 1) * TRANS;
+  const logical = [hero, hello, intro, ...projects, $('#record'), $('#leadership'), $('#toolbox'), contact];
+  const exitSel = { hello: ['.pin-stage'], projects: ['.col'], stage: ['.stage-sticky'], ews: ['.project-inner'], gitbox: ['.project-inner'], margin: ['.project-inner'], record: ['.col', '.bench-wrap'], leadership: ['.lead-inner'], toolbox: ['.tool-inner'] };
+  projects.forEach((p) => { p._parts = $$('.project-text > *', p); p._obj = $('.obj', p); p._ok = toOk(p.dataset.bg); });
+  const stageCols = projects.map((p) => p._ok);
+
+  // rim dots on the shared plate, so the turntable visibly turns
+  const rimG = $('.rim');
+  const rimDots = [];
+  if (rimG) for (let i = 0; i < 10; i++) {
+    const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    rimG.appendChild(c); rimDots.push(c);
+  }
+
+  let vh = innerHeight, segs = [], staged = false, stageTop = 0, stageRange = 1, helloTop = 0, helloH = 1, heroH = 1, contactTop = 0;
+  const docTop = (el) => el.getBoundingClientRect().top + scrollY;
+
+  function clearStage() {
+    projects.forEach((p) => { p._parts.forEach((el) => { el.style.opacity = ''; el.style.transform = ''; }); p._obj.style.cssText = ''; });
+  }
+  function measure() {
+    vh = innerHeight;
+    const want = stageMQ.matches && !reduce;
+    if (want !== staged) { staged = want; root.classList.toggle('staged', staged); if (!staged) clearStage(); }
+    $$('.pin-stage, .col, .stage-sticky, .project-inner, .bench-wrap, .lead-inner, .tool-inner').forEach((w) => { w.style.opacity = ''; w.style.transform = ''; });
+    const list = [hero, hello, intro, ...(staged ? [stage] : projects), $('#record'), $('#leadership'), $('#toolbox'), contact];
+    segs = list.map((el) => {
+      const sel = exitSel[el.id] || [];
+      const wraps = sel.flatMap((q) => $$(q, el).filter((w) => w.closest('section, .stage') === el || el === stage));
+      return { el, top: docTop(el), h: el.offsetHeight, ok: el === stage ? null : toOk(el.dataset.bg), wraps, last: -1 };
+    });
+    stageTop = docTop(stage); stageRange = Math.max(1, stage.offsetHeight - vh);
+    helloTop = docTop(hello); helloH = hello.offsetHeight;
+    heroH = hero.offsetHeight; contactTop = docTop(contact);
+  }
+
+  function targetY(id) {
+    if (id === 'top' || id === '') return 0;
+    const el = document.getElementById(id);
+    if (!el) return null;
+    const k = projects.indexOf(el);
+    if (staged && k >= 0) return stageTop + ((k * (HOLD + TRANS) + HOLD / 2) / UNITS) * stageRange;
+    return docTop(el);
+  }
+
+  // continuous project index: holds on each project, eased turns between them, plus a spin-in as the stage arrives
+  function stageF(S) {
+    let u = clamp((S - stageTop) / stageRange) * UNITS, f = 0;
+    for (let k = 0; k < projects.length; k++) {
+      if (u <= HOLD) { f = k; break; }
+      u -= HOLD;
+      if (k === projects.length - 1) { f = k; break; }
+      if (u <= TRANS) { f = k + eInOut(u / TRANS); break; }
+      u -= TRANS;
+    }
+    const arriving = stageTop - S;
+    if (arriving > 0) f -= .62 * clamp(arriving / (vh * .85));
+    return f;
+  }
+
+  function applyStage(f) {
+    projects.forEach((p, k) => {
+      const x = clamp(f - k, -1, 1);
+      p._parts.forEach((el, j) => {
+        let o, y;
+        if (x >= 0) { const e = eIn((x - j * .06) / .3); o = 1 - e; y = -e * 46; }
+        else { const a = eOut((x + .52 - j * .07) / .32); o = a; y = (1 - a) * 60; }
+        el.style.opacity = o.toFixed(3);
+        el.style.transform = `translate3d(0,${y.toFixed(1)}px,0)`;
+      });
+      // turntable: the current object sits front and centre, the others turn away to the back
+      const th = x * Math.PI / 2, Z = Math.cos(th);
+      const X = -Math.sin(th) * 38, Y = -(1 - Z) * 16, sc = .58 + .42 * Z;
+      const o = clamp((Z - .08) / .5);
+      const ob = p._obj;
+      ob.style.transform = `translate3d(${X.toFixed(2)}%,${Y.toFixed(2)}%,0) rotate(${(-x * 9).toFixed(2)}deg) scale(${sc.toFixed(3)})`;
+      ob.style.opacity = o.toFixed(3);
+      ob.style.zIndex = String(1 + Math.round(Z * 10));
+    });
+    const turn = f * Math.PI / 2;
+    rimDots.forEach((c, i) => {
+      const a = i * (Math.PI * 2 / rimDots.length) + turn;
+      const front = Math.sin(a);
+      c.setAttribute('cx', (300 + 226 * Math.cos(a)).toFixed(1));
+      c.setAttribute('cy', (481 + 40 * front).toFixed(1));
+      c.setAttribute('r', (2.2 + 1.2 * (front + 1) / 2).toFixed(2));
+    });
+  }
+
+  let tone = '', activeEl = null, overIndex = false, pillAlt = false;
+  const PINK = toOk('#ffb3cd');
+  function render(S) {
+    const mid = S + vh * .5;
+    const f = staged ? stageF(S) : 0;
+
+    // 1) backdrop colour: the section's own colour, blended across each boundary
+    let i = segs.findIndex((s) => mid < s.top + s.h);
+    if (i < 0) i = segs.length - 1;
+    const sg = segs[i], w = vh * .6;
+    const cStart = (s) => (s.el === stage ? stageCols[0] : s.ok);
+    const cEnd = (s) => (s.el === stage ? stageCols[stageCols.length - 1] : s.ok);
+    let c = sg.el === stage ? mixN(stageCols, Math.max(0, f)) : sg.ok;
+    if (i < segs.length - 1 && mid > sg.top + sg.h - w / 2) c = mix(cEnd(sg), cStart(segs[i + 1]), sstep((mid - (sg.top + sg.h - w / 2)) / w));
+    else if (i > 0 && mid < sg.top + w / 2) c = mix(cEnd(segs[i - 1]), cStart(sg), sstep((mid - (sg.top - w / 2)) / w));
+    const col = fromOk(c);
+    const rgbStr = `rgb(${col.rgb.join(',')})`;
+    backdrop.style.backgroundColor = rgbStr;
+    root.style.setProperty('--bgc', rgbStr);
+    // the pink index pill switches to cream while the page itself is pink
+    const pinkD = Math.hypot(c[0] - PINK[0], c[1] - PINK[1], c[2] - PINK[2]);
+    const alt = pinkD < .08;
+    if (alt !== pillAlt) { pillAlt = alt; hud.classList.toggle('pill-alt', alt); }
+    const t = col.lum < .3 ? 'light' : 'dark';
+    if (t !== tone) { tone = t; rail.dataset.tone = t; if (!overIndex) hud.dataset.tone = t; }
+
+    // 2) hero drifts away, the sun keeps rising
+    const hp = clamp(S / heroH);
+    hero.style.setProperty('--hp', hp.toFixed(4));
+    if (heroSky) heroSky._p = hp;
+
+    // 3) hello: words light up while the stage is pinned
+    const p = clamp((S - helloTop) / Math.max(1, helloH - vh));
+    hello.style.setProperty('--p', p.toFixed(4));
+    const shown = reduce ? words.length : Math.round(clamp((p - .06) / .7) * words.length);
+    words.forEach((wd, k) => wd.classList.toggle('on', k < shown));
+
+    // 4) projects turntable
+    if (staged) applyStage(f);
+
+    // 5) content fades out as it leaves through the top, so sections hand over instead of cutting
+    segs.forEach((s) => {
+      if (!s.wraps.length || reduce) return;
+      const b = s.top + s.h - S;
+      const e = eIn((vh * .62 - b) / (vh * .55));
+      if (Math.abs(e - s.last) < .002) return;
+      s.last = e;
+      s.wraps.forEach((wr) => {
+        wr.style.opacity = e ? (1 - e).toFixed(3) : '';
+        wr.style.transform = e ? `translate3d(0,${(-e * 6).toFixed(2)}vh,0)` : '';
+      });
+    });
+
+    // 6) night falls into the closing section and the sun comes up again
+    const q = clamp((S + vh - contactTop) / vh);
+    contact.style.setProperty('--op', (.1 + .9 * sstep(q)).toFixed(3));
+    if (outroSky) outroSky._p = sstep(q);
+
+    // 7) top bar label and left rail
+    let act = sg.el;
+    if (sg.el === stage) act = projects[clamp(Math.round(f), 0, projects.length - 1)];
+    if (act !== activeEl) {
+      activeEl = act;
+      hudHash.textContent = act.dataset.hash || '';
+      hudLabel.textContent = act.dataset.label || '';
+      hudFile.classList.toggle('on', !!act.dataset.label);
+      ticks.forEach((tk, k) => tk.classList.toggle('on', logical[k] === act));
+    }
+  }
+
+  // rail ticks, one per logical section
+  const ticks = logical.map((s) => {
     const a = document.createElement('a');
     a.href = `#${s.id}`;
     a.innerHTML = `<span>${s.dataset.name || ''}</span>`;
@@ -270,31 +448,48 @@
     rail.appendChild(a);
     return a;
   });
-  function setActive(s) {
-    const tone = s.dataset.tone || 'light';
-    hud.dataset.tone = tone;
-    rail.dataset.tone = tone;
-    const label = s.dataset.label || '';
-    hudHash.textContent = s.dataset.hash || '';
-    hudLabel.textContent = label;
-    hudFile.classList.toggle('on', !!label);
-    ticks.forEach((t, i) => t.classList.toggle('on', sections[i] === s));
+
+  // smoothing loop: S eases toward the real scroll position, frame-rate independent
+  let S = scrollY, T = scrollY, looping = false, last = 0;
+  function loop(now) {
+    const dt = Math.min(64, now - last || 16.7); last = now;
+    S += (T - S) * (1 - Math.pow(1 - .15, dt / 16.7));
+    if (Math.abs(T - S) < .35) S = T;
+    render(S);
+    if (S !== T) requestAnimationFrame(loop); else looping = false;
   }
-  // the section under the top bar sets its colours; a centre band picks the label
-  function pickByLine(y) {
-    for (const s of sections) { const r = s.getBoundingClientRect(); if (r.top <= y && r.bottom > y) return s; }
-    return sections[0];
+  function kick() {
+    T = scrollY;
+    if (reduce) { S = T; render(S); return; }
+    if (!looping) { looping = true; last = performance.now(); requestAnimationFrame(loop); }
   }
-  let hudTick = false;
-  function updateHud() {
-    const topS = pickByLine(30);
-    const midS = pickByLine(innerHeight * .45);
-    setActive(midS);
-    hud.dataset.tone = topS.dataset.tone || 'light';
-    hudTick = false;
+  function relayout() { measure(); S = T = scrollY; render(S); }
+  window.addEventListener('scroll', kick, { passive: true });
+  let rz = 0;
+  window.addEventListener('resize', () => { cancelAnimationFrame(rz); rz = requestAnimationFrame(relayout); });
+  if ('ResizeObserver' in window) {
+    let ro = 0, lastH = 0;
+    new ResizeObserver(() => { const h = document.body.scrollHeight; if (h === lastH) return; lastH = h; cancelAnimationFrame(ro); ro = requestAnimationFrame(relayout); }).observe(document.body);
   }
-  window.addEventListener('scroll', () => { if (!hudTick) { hudTick = true; requestAnimationFrame(updateHud); } }, { passive: true });
-  updateHud();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(relayout);
+  window.addEventListener('load', relayout);
+  stageMQ.addEventListener && stageMQ.addEventListener('change', relayout);
+  measure();
+  if (location.hash) {
+    const y = targetY(decodeURIComponent(location.hash.slice(1)));
+    if (y != null) { window.scrollTo({ top: y, behavior: 'instant' }); }
+  }
+  S = T = scrollY;
+  render(S);
+
+  /* ---------------------------------------------------------------- In-page links go through targetY, so stage projects land right */
+  function go(id) {
+    const y = targetY(id);
+    if (y == null) return false;
+    window.scrollTo({ top: y, behavior: reduce ? 'auto' : 'smooth' });
+    history.replaceState(null, '', id === 'top' ? location.pathname : `#${id}`);
+    return true;
+  }
 
   /* ---------------------------------------------------------------- Index overlay */
   const pill = $('.pill');
@@ -306,8 +501,8 @@
     requestAnimationFrame(() => index.classList.add('open'));
     pill.setAttribute('aria-expanded', 'true');
     document.body.classList.add('index-open');
+    overIndex = true;
     hud.dataset.tone = 'dark';
-    hud.classList.add('over-index');
     $('a', index).focus({ preventScroll: true });
   }
   function closeIndex(restore = true) {
@@ -315,28 +510,23 @@
     index.hidden = true;
     pill.setAttribute('aria-expanded', 'false');
     document.body.classList.remove('index-open');
-    hud.classList.remove('over-index');
-    updateHud();
+    overIndex = false;
+    hud.dataset.tone = tone;
     if (restore && lastFocus) lastFocus.focus({ preventScroll: true });
   }
   pill.addEventListener('click', () => (index.hidden ? openIndex() : closeIndex()));
-  index.addEventListener('click', (e) => {
-    const a = e.target.closest('a');
-    if (a) {
-      e.preventDefault();
-      closeIndex(false);
-      const target = $(a.getAttribute('href'));
-      if (target) {
-        target.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' });
-        history.replaceState(null, '', a.getAttribute('href'));
-      }
-    } else if (e.target === index) closeIndex();
+  index.addEventListener('click', (e) => { if (e.target === index) closeIndex(); });
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest('a[href^="#"]');
+    if (!a) return;
+    const id = decodeURIComponent(a.getAttribute('href').slice(1));
+    if (!index.hidden) closeIndex(false);
+    if (go(id)) e.preventDefault();
   });
   document.addEventListener('keydown', (e) => {
     if (index.hidden) return;
     if (e.key === 'Escape') closeIndex();
     if (e.key === 'Tab') {
-      // keep focus inside the deck and the toggle
       const f = [pill, ...$$('a', index)];
       const i = f.indexOf(document.activeElement);
       if (e.shiftKey && i <= 0) { e.preventDefault(); f[f.length - 1].focus(); }
@@ -344,20 +534,39 @@
     }
   });
 
+  /* ---------------------------------------------------------------- 400+ counts up when it arrives */
+  const count = $('.count');
+  if (count && !reduce && 'IntersectionObserver' in window) {
+    count.style.minWidth = `${count.offsetWidth}px`;
+    count.textContent = '0';
+    const io = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return;
+      io.disconnect();
+      const t0 = performance.now(), dur = 1500;
+      const step = (now) => {
+        const k = clamp((now - t0) / dur);
+        count.textContent = String(Math.round(400 * (1 - Math.pow(2, -10 * k))));
+        if (k < 1) requestAnimationFrame(step); else count.textContent = '400';
+      };
+      requestAnimationFrame(step);
+    }, { threshold: .5 });
+    io.observe(count);
+  }
+
   /* ---------------------------------------------------------------- Orange cursor dot */
   const dot = $('.cursor');
   if (matchMedia('(pointer: fine)').matches && !reduce) {
     let x = -100, y = -100, cx = -100, cy = -100, on = false;
     window.addEventListener('pointermove', (e) => {
       x = e.clientX; y = e.clientY;
-      if (!on) { on = true; cx = x; cy = y; dot.classList.add('live'); loop(); }
+      if (!on) { on = true; cx = x; cy = y; dot.classList.add('live'); dloop(); }
       dot.classList.toggle('big', !!e.target.closest('a, button'));
     }, { passive: true });
     document.addEventListener('pointerleave', () => { dot.classList.remove('live'); on = false; });
-    function loop() {
+    function dloop() {
       cx += (x - cx) * .2; cy += (y - cy) * .2;
       dot.style.transform = `translate3d(${cx}px, ${cy}px, 0)`;
-      if (on) requestAnimationFrame(loop);
+      if (on) requestAnimationFrame(dloop);
     }
   }
 

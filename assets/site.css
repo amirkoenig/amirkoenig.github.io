@@ -336,9 +336,12 @@ button { font: inherit; color: inherit; }
   flex: 0 0 6.2em; font-weight: 400; text-transform: uppercase; letter-spacing: .08em; font-size: .78em; opacity: .78;
   padding-top: .18em;
 }
-.project-art { position: relative; }
+.project-art { position: relative; display: grid; }
+.project-art > .plate-svg, .project-art > .obj { grid-area: 1 / 1; }
 .project-art svg { width: 100%; height: auto; max-width: 620px; margin: 0 auto; overflow: visible; }
-.js .project-art svg { animation: bob 7s ease-in-out infinite; }
+.obj { position: relative; z-index: 1; }
+.js .project-art .obj svg { animation: bob 7s ease-in-out infinite; }
+.rim circle { fill: #e0d7c9; }
 @keyframes bob { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-8px) rotate(-.6deg); } }
 
 /* ------------------------------------------------------------------ Leadership */
@@ -562,6 +565,73 @@ body.index-open { overflow: hidden; }
   .toc { top: 70%; }
   .toc li + li { margin-top: 4px; }
 }
+
+/* ------------------------------------------------------------------ Flow: one continuous page
+   With JS on, sections lose their own backgrounds. A fixed backdrop carries the colour and the
+   paper grain, and its colour is blended from section to section as you scroll (see site.js). */
+.backdrop { display: none; }
+.js .backdrop {
+  display: block; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-color: var(--night);
+}
+.js .backdrop::after {
+  content: ""; position: absolute; inset: 0;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+    radial-gradient(ellipse 60% 50% at 10% 15%, rgba(0,0,0,.4), transparent 70%),
+    radial-gradient(ellipse 55% 60% at 92% 80%, rgba(0,0,0,.34), transparent 70%);
+  background-size: 260px 260px, 100% 100%, 100% 100%;
+  opacity: .13;
+  mix-blend-mode: multiply;
+}
+.js main { position: relative; z-index: 1; }
+/* content dissolves under the top bar, in whatever colour the page currently is */
+.js .hud::before {
+  content: ""; position: absolute; inset: 0 0 -28px 0; z-index: -1; pointer-events: none;
+  background: linear-gradient(var(--bgc, #0f0f0e) 30%, transparent);
+}
+.js body.index-open .hud::before { opacity: 0; }
+.hud.pill-alt .pill { background: var(--cream); }
+.hud.pill-alt .pill:hover { background: #fff; }
+.js main section { background: transparent; }
+.js .field { isolation: auto; }
+.js .field::before { display: none; }
+
+/* Hero exit: the title drifts and fades, the sky lags behind it and bleeds into the next section */
+.js .hero { overflow: visible; }
+.js .hero .sky {
+  opacity: calc(1 - var(--hp, 0) * .92);
+  transform: translate3d(0, calc(var(--hp, 0) * 30vh), 0);
+  -webkit-mask-image: linear-gradient(to bottom, #000 58%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 58%, transparent 100%);
+}
+.js .outro .sky {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 38%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 38%);
+}
+.js .hero-head {
+  transform: translate3d(0, calc(var(--hp, 0) * 12vh), 0) scale(calc(1 - var(--hp, 0) * .05));
+  opacity: calc(1 - var(--hp, 0) * 1.6);
+}
+.js .toc ol { opacity: calc(1 - var(--hp, 0) * 2.6); }
+.js .scroll-hint { opacity: calc(1 - var(--hp, 0) * 5); }
+
+/* Night falls into the closing section */
+.js .outro .sky { opacity: var(--op, 1); }
+
+/* 400+ counts up */
+.count { display: inline-block; text-align: right; }
+
+/* Projects as one pinned stage (wide screens; JS adds .staged) */
+.staged .stage { height: 340vh; }
+.staged .stage-sticky { position: sticky; top: 0; height: 100vh; overflow: hidden; }
+.staged .stage .project { position: absolute; inset: 0; min-height: 0; }
+.staged .stage .project-inner { height: 100%; }
+.staged .stage .project.flip .project-text { order: 0; }
+.staged .stage .project:not(:first-child) .plate-svg { visibility: hidden; }
+.staged .stage .rv { opacity: 1; transform: none; transition: none; }
+.staged .stage .project-text > *, .staged .stage .obj { will-change: transform, opacity; }
+.staged .stage .project-text { pointer-events: none; }
 
 /* ------------------------------------------------------------------ Reduced motion */
 @media (prefers-reduced-motion: reduce) {
