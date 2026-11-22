@@ -259,7 +259,18 @@
     const lr = [4.0767416621 * l - 3.3077115913 * m + .2309699292 * s, -1.2684380046 * l + 2.6097574011 * m - .3413193965 * s, -.0041960863 * l - .7034186147 * m + 1.7076147010 * s].map((c) => clamp(c));
     return { rgb: lr.map((c) => Math.round(delin(c) * 255)), lum: .2126 * lr[0] + .7152 * lr[1] + .0722 * lr[2] };
   }
-  const mix = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
+  // Two saturated colours blend around the hue wheel (OKLCh), so lilac to olive does not dip through grey.
+  // If either side is nearly neutral (ivory, cream, night), a straight OKLab blend looks cleaner.
+  function mix(a, b, t) {
+    const ca = Math.hypot(a[1], a[2]), cb = Math.hypot(b[1], b[2]);
+    if (ca < .04 || cb < .04) return a.map((v, i) => v + (b[i] - v) * t);
+    const ha = Math.atan2(a[2], a[1]);
+    let dh = Math.atan2(b[2], b[1]) - ha;
+    if (dh > Math.PI) dh -= 2 * Math.PI;
+    if (dh < -Math.PI) dh += 2 * Math.PI;
+    const h = ha + dh * t, C = ca + (cb - ca) * t;
+    return [a[0] + (b[0] - a[0]) * t, C * Math.cos(h), C * Math.sin(h)];
+  }
   const mixN = (cols, f) => { const i = clamp(Math.floor(f), 0, cols.length - 1); return mix(cols[i], cols[Math.min(i + 1, cols.length - 1)], clamp(f - i)); };
   const sstep = (t) => { t = clamp(t); return t * t * (3 - 2 * t); };
   const eOut = (t) => 1 - Math.pow(1 - clamp(t), 3);
