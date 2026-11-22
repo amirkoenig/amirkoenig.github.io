@@ -619,6 +619,40 @@ body.index-open { overflow: hidden; }
 /* Night falls into the closing section */
 .js .outro .sky { opacity: var(--op, 1); }
 
+/* Abu Dhabi on a plate, beside "Hello." */
+.ad-art { margin: 0; }
+.ad-art svg { width: 100%; height: auto; overflow: visible; }
+.ad-b, .ad-sun { transform-box: fill-box; transform-origin: 50% 100%; }
+@media (min-width: 900px) {
+  .pin-stage {
+    display: grid; align-content: center; column-gap: 3vw;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr);
+    grid-template-areas: "h art" "big art" "copy copy";
+  }
+  .pin-stage > .md-h { grid-area: h; align-self: end; }
+  .pin-stage > .hello-big { grid-area: big; align-self: start; }
+  .pin-stage > .ad-art { grid-area: art; align-self: end; justify-self: end; width: min(100%, 56vh); margin-bottom: 1vh; }
+  .pin-stage > .hello-copy { grid-area: copy; }
+}
+@media (max-width: 899px) {
+  .ad-art { order: -1; align-self: center; width: min(76vw, 30svh); margin-bottom: 1vh; }
+  .hello-big { font-size: clamp(96px, 26vw, 160px); }
+}
+
+/* ETH beside the record heading */
+.record-head {
+  max-width: 1040px; margin: 0 auto;
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 400px);
+  column-gap: clamp(24px, 4vw, 64px); align-items: center;
+}
+.record-head .col { margin: 0; }
+.eth-art { margin: 0; }
+.eth-art svg { width: 100%; height: auto; overflow: visible; }
+@media (max-width: 899px) {
+  .record-head { grid-template-columns: minmax(0, 1fr); }
+  .eth-art { order: -1; width: min(86vw, 380px); margin: 0 auto 8px; }
+}
+
 /* 400+ counts up */
 .count { display: inline-block; text-align: right; }
 

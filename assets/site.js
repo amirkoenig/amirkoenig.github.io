@@ -19,20 +19,35 @@
     const smooth = (a, b, x) => { const t = clamp((x - a) / (b - a)); return t * t * (3 - 2 * t); };
     const rnd = (s => () => (s = (s * 16807) % 2147483647) / 2147483647)(dusk ? 97 : 31);
 
-    // Feature sizes are in pixels, so dunes and peaks keep their shape from phone to desktop.
+    // The Matterhorn as seen from Zermatt: summit leaning left, steep left face, long right ridge
+    // with the shoulder, lower ridges either side. x in mountain widths from the summit, h in peak heights.
+    const MATTER = [[-3.4, .03], [-3, .09], [-2.6, .14], [-2.3, .11], [-1.95, .18], [-1.6, .15], [-1.3, .21], [-1, .2],
+      [-.78, .26], [-.62, .36], [-.5, .47], [-.42, .5], [-.33, .62], [-.24, .76], [-.18, .86], [-.145, .93], [-.125, .975],
+      [-.1, 1], [-.05, .995], [0, .975], [.05, .955], [.1, .93], [.2, .85], [.3, .775], [.44, .76], [.52, .71], [.68, .58],
+      [.9, .45], [1.15, .33], [1.4, .25], [1.6, .27], [1.85, .2], [2.2, .17], [2.6, .23], [3, .16], [3.5, .08], [4.2, .03]];
+    function matterhorn(xu) {
+      if (xu <= MATTER[0][0]) return MATTER[0][1];
+      for (let i = 1; i < MATTER.length; i++) {
+        const [x1, h1] = MATTER[i];
+        if (xu <= x1) { const [x0, h0] = MATTER[i - 1]; return h0 + (h1 - h0) * (xu - x0) / (x1 - x0); }
+      }
+      return MATTER[MATTER.length - 1][1];
+    }
+
+    // Dunes on the left (in pixels, so they keep their shape on every screen), the Matterhorn massif on the right.
     function ridgeY(x) {
       const u = x / W;
-      const amp = Math.min(H, W * 1.05);
       const arc = Math.pow(u - sunU, 2) * Math.min(H, W) * 0.2;
       const xs = x + (W > 700 ? 0 : 140);
       const z = xs / 68;
+      const amp = Math.min(H, W * 1.05);
       const dune = (Math.sin(z + .6) + .38 * Math.sin(2 * z + 1.1) + .5 * Math.sin(xs / 225 + 2)) * amp * 0.021;
-      const a = xs / 225;
-      let alps = Math.pow(1 - Math.abs(Math.sin(a + .9)), 1.5) * 0.125;
-      alps += Math.pow(1 - Math.abs(Math.sin(a * 2.7 + 2.1)), 1.3) * 0.045;
-      alps += (1 - Math.abs(Math.sin(a * 7.3 + .4))) * 0.009;
+      const peak = Math.min(H * .3, W * .42);
+      const mx = W * (W > 700 ? .79 : .7), unit = peak * .6;
+      const hm = matterhorn((x - mx) / unit);
+      const rough = (Math.sin(x * .23) * .5 + Math.sin(x * .61 + 1.3) * .3 + Math.sin(x * 1.7) * .12) * peak * .012 * (hm > .15 ? 1 : .4);
       const k = smooth(sunU - 0.06, sunU + 0.16, u);
-      return H * baseFrac + arc - (dune * (1 - k) + (alps - 0.012) * amp * k);
+      return H * baseFrac + arc - (dune * (1 - k) + (hm * peak + rough) * k);
     }
 
     function build() {
@@ -293,7 +308,7 @@
   const stageMQ = matchMedia('(min-width: 900px) and (min-height: 620px)');
   const HOLD = 1, TRANS = .85, UNITS = projects.length * HOLD + (projects.length - 1) * TRANS;
   const logical = [hero, hello, intro, ...projects, $('#record'), $('#leadership'), $('#toolbox'), contact];
-  const exitSel = { hello: ['.pin-stage'], projects: ['.col'], stage: ['.stage-sticky'], ews: ['.project-inner'], gitbox: ['.project-inner'], margin: ['.project-inner'], record: ['.col', '.bench-wrap'], leadership: ['.lead-inner'], toolbox: ['.tool-inner'] };
+  const exitSel = { hello: ['.pin-stage'], projects: ['.col'], stage: ['.stage-sticky'], ews: ['.project-inner'], gitbox: ['.project-inner'], margin: ['.project-inner'], record: ['.col', '.eth-art', '.bench-wrap'], leadership: ['.lead-inner'], toolbox: ['.tool-inner'] };
   projects.forEach((p) => { p._parts = $$('.project-text > *', p); p._obj = $('.obj', p); p._ok = toOk(p.dataset.bg); });
   const stageCols = projects.map((p) => p._ok);
 
@@ -303,6 +318,41 @@
   if (rimG) for (let i = 0; i < 10; i++) {
     const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     rimG.appendChild(c); rimDots.push(c);
+  }
+
+  // Abu Dhabi grows as "Abu Dhabi" lights up; a plane leaves when "Zurich" does
+  const adB = $$('.ad-b'), adSun = $('.ad-sun'), adPlane = $('.ad-plane');
+  const widx = (re) => Math.max(0, words.findIndex((w) => re.test(w.textContent)));
+  const pWord = (i) => .06 + .7 * (i + .5) / Math.max(1, words.length);
+  const pAbu = pWord(widx(/^Abu/)), pZur = pWord(widx(/^Zurich/));
+  const eBack = (t) => { t = clamp(t); const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); };
+  function applySkyline(p) {
+    const g = reduce ? 1 : clamp((p - (pAbu - .1)) / .2);
+    adB.forEach((b, k) => {
+      const sc = Math.max(0, eBack(g * 1.9 - k * .09));
+      b.style.transform = `scale(1,${sc.toFixed(3)})`;
+      b.style.opacity = sc > .01 ? '1' : '0';
+    });
+    if (adSun) { adSun.style.transform = `translate(0,${((1 - g) * 90).toFixed(1)}px)`; adSun.style.opacity = g.toFixed(3); }
+    if (adPlane) {
+      const z = reduce ? 0 : clamp((p - (pZur - .05)) / .22), u = eIn(z);
+      const P0 = [432, 470], P1 = [560, 462], P2 = [730, 140];
+      const x = (1 - u) ** 2 * P0[0] + 2 * (1 - u) * u * P1[0] + u * u * P2[0];
+      const y = (1 - u) ** 2 * P0[1] + 2 * (1 - u) * u * P1[1] + u * u * P2[1];
+      const dx = 2 * (1 - u) * (P1[0] - P0[0]) + 2 * u * (P2[0] - P1[0]);
+      const dy = 2 * (1 - u) * (P1[1] - P0[1]) + 2 * u * (P2[1] - P1[1]);
+      adPlane.setAttribute('transform', `translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${(Math.atan2(dy, dx) * 180 / Math.PI).toFixed(1)})`);
+      adPlane.style.opacity = (Math.min(g, 1) * (1 - sstep((z - .72) / .28))).toFixed(3);
+    }
+  }
+  // the red Polybahn climbs to ETH as the record section scrolls in
+  const ethArt = $('.eth-art'), polyCar = $('.poly-car');
+  let ethTop = 0;
+  function applyPolybahn(S) {
+    if (!polyCar) return;
+    const t = reduce ? 1 : eInOut(clamp((S + vh - ethTop) / (vh * .8)));
+    const s0 = .1 + .78 * t;
+    polyCar.setAttribute('transform', `translate(${(100 + 86 * s0).toFixed(1)} ${(528 - 58 * s0).toFixed(1)}) rotate(-33.8)`);
   }
 
   let vh = innerHeight, segs = [], staged = false, stageTop = 0, stageRange = 1, helloTop = 0, helloH = 1, heroH = 1, contactTop = 0;
@@ -315,7 +365,7 @@
     vh = innerHeight;
     const want = stageMQ.matches && !reduce;
     if (want !== staged) { staged = want; root.classList.toggle('staged', staged); if (!staged) clearStage(); }
-    $$('.pin-stage, .col, .stage-sticky, .project-inner, .bench-wrap, .lead-inner, .tool-inner').forEach((w) => { w.style.opacity = ''; w.style.transform = ''; });
+    $$('.pin-stage, .col, .eth-art, .stage-sticky, .project-inner, .bench-wrap, .lead-inner, .tool-inner').forEach((w) => { w.style.opacity = ''; w.style.transform = ''; });
     const list = [hero, hello, intro, ...(staged ? [stage] : projects), $('#record'), $('#leadership'), $('#toolbox'), contact];
     segs = list.map((el) => {
       const sel = exitSel[el.id] || [];
@@ -325,6 +375,7 @@
     stageTop = docTop(stage); stageRange = Math.max(1, stage.offsetHeight - vh);
     helloTop = docTop(hello); helloH = hello.offsetHeight;
     heroH = hero.offsetHeight; contactTop = docTop(contact);
+    ethTop = ethArt ? docTop(ethArt) : 0;
   }
 
   function targetY(id) {
@@ -416,6 +467,8 @@
     hello.style.setProperty('--p', p.toFixed(4));
     const shown = reduce ? words.length : Math.round(clamp((p - .06) / .7) * words.length);
     words.forEach((wd, k) => wd.classList.toggle('on', k < shown));
+    applySkyline(p);
+    applyPolybahn(S);
 
     // 4) projects turntable
     if (staged) applyStage(f);
