@@ -19,12 +19,25 @@
     const smooth = (a, b, x) => { const t = clamp((x - a) / (b - a)); return t * t * (3 - 2 * t); };
     const rnd = (s => () => (s = (s * 16807) % 2147483647) / 2147483647)(dusk ? 97 : 31);
 
-    // The Matterhorn as seen from Zermatt: summit leaning left, steep left face, long right ridge
-    // with the shoulder, lower ridges either side. x in mountain widths from the summit, h in peak heights.
-    const MATTER = [[-3.4, .03], [-3, .09], [-2.6, .14], [-2.3, .11], [-1.95, .18], [-1.6, .15], [-1.3, .21], [-1, .2],
-      [-.78, .26], [-.62, .36], [-.5, .47], [-.42, .5], [-.33, .62], [-.24, .76], [-.18, .86], [-.145, .93], [-.125, .975],
-      [-.1, 1], [-.05, .995], [0, .975], [.05, .955], [.1, .93], [.2, .85], [.3, .775], [.44, .76], [.52, .71], [.68, .58],
-      [.9, .45], [1.15, .33], [1.4, .25], [1.6, .27], [1.85, .2], [2.2, .17], [2.6, .23], [3, .16], [3.5, .08], [4.2, .03]];
+    // Traced from a photo of the Matterhorn from the Gornergrat line (Wikimedia Commons,
+    // "GGB Bhe 4-8 Streckenfuehrung Rotenboden - Gornergrat.jpg"): left ridge, the Matterhorn, the peaks to its right.
+    // x and h are both in peak heights from the summit, so the shape keeps its real proportions.
+    const MATTER = [
+      [-1.46, 0.168], [-1.326, 0.157], [-1.315, 0.173], [-1.267, 0.173], [-1.219, 0.2], [-1.052, 0.211], [-1.026, 0.227], [-0.881, 0.2],
+      [-0.859, 0.179], [-0.693, 0.189], [-0.639, 0.211], [-0.558, 0.2], [-0.526, 0.216], [-0.489, 0.259], [-0.349, 0.549], [-0.285, 0.592],
+      [-0.258, 0.646], [-0.172, 0.742], [-0.14, 0.753], [-0.129, 0.78], [-0.091, 0.78], [-0.086, 0.812], [-0.07, 0.812], [-0.048, 0.946],
+      [-0.021, 0.962], [0, 1], [0.021, 1], [0.107, 0.919], [0.156, 0.839], [0.177, 0.834], [0.226, 0.753], [0.252, 0.732],
+      [0.311, 0.635], [0.36, 0.452], [0.397, 0.431], [0.446, 0.436], [0.564, 0.318], [0.591, 0.318], [0.596, 0.297], [0.709, 0.238],
+      [0.719, 0.211], [0.762, 0.205], [0.805, 0.152], [0.859, 0.114], [0.907, 0.119], [0.913, 0.087], [0.94, 0.077], [0.945, 0.044],
+      [0.966, 0.044], [0.977, 0.023], [1.058, 0.017], [1.063, 0.044], [1.111, 0.044], [1.117, 0.028], [1.235, 0.039], [1.24, 0.023],
+      [1.353, 0.023], [1.358, 0.039], [1.374, 0.039], [1.38, -0.02], [1.45, -0.02], [1.455, 0.007], [1.804, 0.007], [1.809, -0.02],
+      [1.879, -0.02], [1.885, 0.012], [1.901, 0.017], [1.906, 0.044], [1.922, 0.044], [1.949, -0.015], [1.992, -0.015], [2.089, -0.047],
+      [2.115, -0.074], [2.18, -0.068], [2.207, -0.095], [2.223, -0.074], [2.421, -0.063], [2.491, -0.036], [2.685, -0.031], [2.695, -0.036],
+      [2.701, -0.133], [2.722, -0.154], [2.744, -0.154], [2.76, -0.079], [2.787, -0.068], [2.83, -0.015], [2.835, 0.012], [2.894, 0.055],
+      [2.953, 0.044], [3.179, 0.055], [3.259, 0.087], [3.372, 0.157], [3.42, 0.168], [3.511, 0.157], [3.592, 0.179], [3.742, 0.243],
+      [3.828, 0.318], [4.054, 0.436], [4.102, 0.42], [4.177, 0.35], [4.263, 0.323], [4.29, 0.297], [4.306, 0.243], [4.328, 0.243],
+      [4.354, 0.184], [4.424, 0.098], [4.537, 0.152], [4.607, 0.136], [4.821, 0.146], [4.945, 0.179], [4.977, 0.179], [5.02, 0.157],
+      [5.133, 0.179], [5.176, 0.136], [5.278, 0.071], [5.315, 0.071], [5.326, 0.087], [5.407, 0.103]];
     function matterhorn(xu) {
       if (xu <= MATTER[0][0]) return MATTER[0][1];
       for (let i = 1; i < MATTER.length; i++) {
@@ -42,10 +55,10 @@
       const z = xs / 68;
       const amp = Math.min(H, W * 1.05);
       const dune = (Math.sin(z + .6) + .38 * Math.sin(2 * z + 1.1) + .5 * Math.sin(xs / 225 + 2)) * amp * 0.021;
-      const peak = Math.min(H * .3, W * .42);
-      const mx = W * (W > 700 ? .79 : .7), unit = peak * .6;
-      const hm = matterhorn((x - mx) / unit);
-      const rough = (Math.sin(x * .23) * .5 + Math.sin(x * .61 + 1.3) * .3 + Math.sin(x * 1.7) * .12) * peak * .012 * (hm > .15 ? 1 : .4);
+      const peak = Math.min(H * .32, W * .45);
+      const mx = W * (W > 700 ? .78 : .68);
+      const hm = matterhorn((x - mx) / peak);
+      const rough = 0;
       const k = smooth(sunU - 0.06, sunU + 0.16, u);
       return H * baseFrac + arc - (dune * (1 - k) + (hm * peak + rough) * k);
     }
@@ -320,29 +333,28 @@
     rimG.appendChild(c); rimDots.push(c);
   }
 
-  // Abu Dhabi grows as "Abu Dhabi" lights up; a plane leaves when "Zurich" does
-  const adB = $$('.ad-b'), adSun = $('.ad-sun'), adPlane = $('.ad-plane');
+  // The Abu Dhabi skyline rises from the bottom edge, middle first, done as "Abu Dhabi" lights up;
+  // a plane crosses the sky when "Zurich" does
+  const skB = $$('.sk-b'), skFar = $('.sk-far'), skSun = $('.sk-sun'), skPalms = $('.sk-palms'), skPlane = $('.sk-plane');
   const widx = (re) => Math.max(0, words.findIndex((w) => re.test(w.textContent)));
   const pWord = (i) => .06 + .7 * (i + .5) / Math.max(1, words.length);
   const pAbu = pWord(widx(/^Abu/)), pZur = pWord(widx(/^Zurich/));
-  const eBack = (t) => { t = clamp(t); const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); };
+  const lift = (el, e) => { el.style.transform = `translate3d(0,${((1 - e) * 104).toFixed(2)}%,0)`; };
   function applySkyline(p) {
-    const g = reduce ? 1 : clamp((p - (pAbu - .1)) / .2);
-    adB.forEach((b, k) => {
-      const sc = Math.max(0, eBack(g * 1.9 - k * .09));
-      b.style.transform = `scale(1,${sc.toFixed(3)})`;
-      b.style.opacity = sc > .01 ? '1' : '0';
-    });
-    if (adSun) { adSun.style.transform = `translate(0,${((1 - g) * 90).toFixed(1)}px)`; adSun.style.opacity = g.toFixed(3); }
-    if (adPlane) {
-      const z = reduce ? 0 : clamp((p - (pZur - .05)) / .22), u = eIn(z);
-      const P0 = [432, 470], P1 = [560, 462], P2 = [730, 140];
+    const g = reduce ? 1 : clamp((p - (pAbu - .3)) / .34);
+    if (skFar) lift(skFar, eOut(g * 1.35));
+    skB.forEach((b) => lift(b, eOut(g * 1.7 - parseFloat(b.dataset.c || 0) * .7)));
+    if (skPalms) lift(skPalms, eOut(g * 1.6 - .55));
+    if (skSun) { const e = eOut(g * 1.2 - .2); skSun.style.transform = `translate3d(0,${((1 - e) * 520).toFixed(1)}%,0)`; skSun.style.opacity = e.toFixed(3); }
+    if (skPlane) {
+      const z = reduce ? 0 : clamp((p - (pZur - .05)) / .24), u = eIn(z);
+      const P0 = [240, 440], P1 = [720, 330], P2 = [1760, -80];
       const x = (1 - u) ** 2 * P0[0] + 2 * (1 - u) * u * P1[0] + u * u * P2[0];
       const y = (1 - u) ** 2 * P0[1] + 2 * (1 - u) * u * P1[1] + u * u * P2[1];
       const dx = 2 * (1 - u) * (P1[0] - P0[0]) + 2 * u * (P2[0] - P1[0]);
       const dy = 2 * (1 - u) * (P1[1] - P0[1]) + 2 * u * (P2[1] - P1[1]);
-      adPlane.setAttribute('transform', `translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${(Math.atan2(dy, dx) * 180 / Math.PI).toFixed(1)})`);
-      adPlane.style.opacity = (Math.min(g, 1) * (1 - sstep((z - .72) / .28))).toFixed(3);
+      skPlane.setAttribute('transform', `translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${(Math.atan2(dy, dx) * 180 / Math.PI).toFixed(1)})`);
+      skPlane.style.opacity = (clamp(z * 10) * (1 - sstep((z - .82) / .18))).toFixed(3);
     }
   }
   // the red Polybahn climbs to ETH as the record section scrolls in

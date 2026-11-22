@@ -619,25 +619,18 @@ body.index-open { overflow: hidden; }
 /* Night falls into the closing section */
 .js .outro .sky { opacity: var(--op, 1); }
 
-/* Abu Dhabi on a plate, beside "Hello." */
-.ad-art { margin: 0; }
-.ad-art svg { width: 100%; height: auto; overflow: visible; }
-.ad-b, .ad-sun { transform-box: fill-box; transform-origin: 50% 100%; }
-@media (min-width: 900px) {
-  .pin-stage {
-    display: grid; align-content: center; column-gap: 3vw;
-    grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr);
-    grid-template-areas: "h art" "big art" "copy copy";
-  }
-  .pin-stage > .md-h { grid-area: h; align-self: end; }
-  .pin-stage > .hello-big { grid-area: big; align-self: start; }
-  .pin-stage > .ad-art { grid-area: art; align-self: end; justify-self: end; width: min(100%, 56vh); margin-bottom: 1vh; }
-  .pin-stage > .hello-copy { grid-area: copy; }
+/* Abu Dhabi skyline: full width behind the hello text, rising from the bottom edge */
+.pin-stage > :not(.skyline) { position: relative; z-index: 1; }
+.skyline {
+  position: absolute; z-index: 0; left: 50%; bottom: 0;
+  width: 100vw; height: clamp(260px, 60svh, 680px);
+  transform: translateX(-50%);
+  overflow: hidden; pointer-events: none;
 }
-@media (max-width: 899px) {
-  .ad-art { order: -1; align-self: center; width: min(76vw, 30svh); margin-bottom: 1vh; }
-  .hello-big { font-size: clamp(96px, 26vw, 160px); }
-}
+.skyline svg { display: block; width: 100%; height: 100%; }
+/* a soft halo in the page blue keeps the text clear of the window grid behind it */
+.hello-copy, .pin-stage > .md-h { text-shadow: 0 0 22px rgba(29,63,191,.95), 0 0 6px rgba(29,63,191,.9); }
+.sk-b, .sk-far, .sk-sun, .sk-palms { transform-box: fill-box; transform-origin: 50% 100%; }
 
 /* ETH beside the record heading */
 .record-head {
