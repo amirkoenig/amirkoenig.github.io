@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Amir König</title>
+  <meta name="description" content="Amir König, product-minded software engineer studying computer science at ETH Zurich. Builder of EWS, Gitbox and Margin.">
+  <meta name="theme-color" content="#0f0f0e">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Amir König">
+  <meta property="og:description" content="Product-minded software engineer studying computer science at ETH Zurich.">
+  <meta property="og:url" content="https://amirkoenig.github.io/">
+  <link rel="canonical" href="https://amirkoenig.github.io/">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300..800&family=Cutive+Mono&family=Instrument+Serif:ital@0;1&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&display=swap">
+  <link rel="stylesheet" href="assets/site.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Amir König",
+    "url": "https://amirkoenig.github.io/",
+    "jobTitle": "Software engineer",
+    "affiliation": { "@type": "CollegeOrUniversity", "name": "ETH Zurich" },
+    "knowsLanguage": ["en", "de", "ar", "fr"],
+    "sameAs": ["https://www.linkedin.com/in/amir-konig"]
+  }
+  </script>
+  <script>document.documentElement.classList.add('js')</script>
+</head>
+<body>
+  <a class="skip" href="#hello">Skip to the text</a>
+
+  <!-- Shared SVG pieces: gradients, filters and the three project objects -->
+  <svg class="sprite" aria-hidden="true" focusable="false">
+    <defs>
+      <filter id="soft" x="-30%" y="-80%" width="160%" height="260%"><feGaussianBlur stdDeviation="9"/></filter>
+      <filter id="softer" x="-30%" y="-80%" width="160%" height="260%"><feGaussianBlur stdDeviation="4"/></filter>
+      <linearGradient id="plateWell" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e9e2d7"/><stop offset="1" stop-color="#f8f5ef"/></linearGradient>
+      <linearGradient id="plateSide" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e2dacd"/><stop offset="1" stop-color="#c9bfb0"/></linearGradient>
+      <linearGradient id="ewsScreen" x1="0" y1="0" x2="0.3" y2="1"><stop offset="0" stop-color="#0c1830"/><stop offset="1" stop-color="#1a2f5c"/></linearGradient>
+      <linearGradient id="sweepGrad" x1="1" y1="1" x2="0.2" y2="0"><stop offset="0" stop-color="#9fd0f0" stop-opacity=".55"/><stop offset="1" stop-color="#9fd0f0" stop-opacity="0"/></linearGradient>
+      <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd25e"/><stop offset="1" stop-color="#e0a116"/></linearGradient>
+      <linearGradient id="boxTop" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4b6ce6"/><stop offset="1" stop-color="#2f50d0"/></linearGradient>
+      <linearGradient id="boxLeft" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2346cc"/><stop offset="1" stop-color="#1a38b0"/></linearGradient>
+      <linearGradient id="boxRight" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#16309c"/><stop offset="1" stop-color="#112680"/></linearGradient>
+      <linearGradient id="padFrame" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#eeebe6"/><stop offset="1" stop-color="#bfbab2"/></linearGradient>
+
+      <g id="plate">
+        <ellipse cx="300" cy="512" rx="236" ry="34" fill="#000" opacity=".2" filter="url(#soft)"/>
+        <ellipse cx="300" cy="490" rx="240" ry="48" fill="url(#plateSide)"/>
+        <ellipse cx="300" cy="481" rx="240" ry="45" fill="#fbf8f3"/>
+        <ellipse cx="300" cy="483" rx="178" ry="30" fill="url(#plateWell)"/>
+      </g>
+
+      <!-- EWS: a phone on a plate, lock screen with an alert and a live radar -->
+      <symbol id="art-ews" viewBox="0 0 600 560">
+        <use href="#plate"/>
+        <ellipse cx="300" cy="482" rx="104" ry="11" fill="#000" opacity=".28" filter="url(#softer)"/>
+        <g transform="rotate(-4 300 300)">
+          <rect x="198" y="66" width="204" height="414" rx="40" fill="#151518"/>
+          <rect x="201" y="69" width="198" height="408" rx="37" fill="none" stroke="#45454c" stroke-width="2"/>
+          <rect x="209" y="77" width="182" height="392" rx="31" fill="url(#ewsScreen)"/>
+          <rect x="271" y="89" width="58" height="17" rx="8.5" fill="#000"/>
+          <text x="300" y="166" text-anchor="middle" fill="#faf9f5" font-family="Bricolage Grotesque, sans-serif" font-size="50" font-weight="600" letter-spacing="-1.5">9:41</text>
+          <g transform="translate(219 186)">
+            <rect width="162" height="60" rx="15" fill="#faf9f5" fill-opacity=".94"/>
+            <rect x="11" y="12" width="22" height="22" rx="6.5" fill="#fc4109"/>
+            <path d="M22 17 v7 M22 28 v1.5" stroke="#faf9f5" stroke-width="2.6" stroke-linecap="round"/>
+            <text x="41" y="22" fill="#5e5d59" font-family="Bricolage Grotesque, sans-serif" font-size="10" font-weight="600" letter-spacing=".4">EWS · NOW</text>
+            <text x="41" y="37" fill="#1f1e1d" font-family="Bricolage Grotesque, sans-serif" font-size="12.5" font-weight="600">Risk level updated</text>
+            <rect x="41" y="44" width="92" height="4" rx="2" fill="#cfc9be"/>
+          </g>
+          <g transform="translate(300 362)">
+            <circle r="80" fill="#6ea6cf" fill-opacity=".07" stroke="#faf9f5" stroke-opacity=".2"/>
+            <circle r="54" fill="none" stroke="#faf9f5" stroke-opacity=".14"/>
+            <circle r="27" fill="none" stroke="#faf9f5" stroke-opacity=".12"/>
+            <path d="M-80 0H80M0 -80V80" stroke="#faf9f5" stroke-opacity=".08"/>
+            <g>
+              <path d="M0 0 L80 0 A80 80 0 0 0 56.6 -56.6 Z" fill="url(#sweepGrad)"/>
+              <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="4.5s" repeatCount="indefinite"/>
+            </g>
+            <circle cx="31" cy="-24" r="4.5" fill="#fc4109"><animate attributeName="opacity" values="1;.25;1" dur="2.2s" repeatCount="indefinite"/></circle>
+            <circle cx="31" cy="-24" r="4.5" fill="none" stroke="#fc4109" stroke-width="1.5"><animate attributeName="r" values="4.5;16" dur="2.2s" repeatCount="indefinite"/><animate attributeName="opacity" values=".9;0" dur="2.2s" repeatCount="indefinite"/></circle>
+            <circle cx="-42" cy="17" r="3.2" fill="#ffb3cd"><animate attributeName="opacity" values=".3;1;.3" dur="3.1s" repeatCount="indefinite"/></circle>
+            <circle cx="12" cy="46" r="3.2" fill="#f2b632"><animate attributeName="opacity" values="1;.35;1" dur="2.7s" repeatCount="indefinite"/></circle>
+            <circle r="3" fill="#faf9f5"/>
+          </g>
+          <rect x="264" y="452" width="72" height="4" rx="2" fill="#faf9f5" fill-opacity=".55"/>
+        </g>
+      </symbol>
+
+      <!-- Gitbox: a blue box with a padlock and a "verified" tag -->
+      <symbol id="art-gitbox" viewBox="0 0 600 560">
+        <use href="#plate"/>
+        <ellipse cx="300" cy="474" rx="150" ry="16" fill="#000" opacity=".3" filter="url(#softer)"/>
+        <path d="M300 168 L444 240 L300 312 L156 240 Z" fill="url(#boxTop)"/>
+        <path d="M156 240 L300 312 L300 466 L156 394 Z" fill="url(#boxLeft)"/>
+        <path d="M300 312 L444 240 L444 394 L300 466 Z" fill="url(#boxRight)"/>
+        <path d="M156 262 L300 334 L444 262" fill="none" stroke="#0d1f66" stroke-opacity=".55" stroke-width="2"/>
+        <path d="M156 240 L300 312 L444 240" fill="none" stroke="#7d95f0" stroke-opacity=".7" stroke-width="1.5"/>
+        <path d="M300 168 L444 240 L300 312 L156 240 Z" fill="none" stroke="#9fb2ff" stroke-opacity=".35" stroke-width="1.5"/>
+        <!-- branch glyph painted on the left face -->
+        <g transform="matrix(1 .5 0 1 190 300)" fill="none" stroke="#f4efe8" stroke-width="7" stroke-linecap="round">
+          <circle cx="14" cy="14" r="9"/>
+          <circle cx="14" cy="86" r="9"/>
+          <circle cx="66" cy="30" r="9"/>
+          <path d="M14 23 V77"/>
+          <path d="M66 39 C66 62 14 56 14 77"/>
+        </g>
+        <!-- hasp and padlock on the right face -->
+        <path d="M362 312 l20 -10 v26 l-20 10 Z" fill="#c9c3b8"/>
+        <path d="M352 352 V334 a21 21 0 0 1 42 0 V352" fill="none" stroke="#d9d3c8" stroke-width="9" stroke-linecap="round"/>
+        <rect x="340" y="348" width="66" height="56" rx="11" fill="url(#gold)"/>
+        <rect x="340" y="348" width="66" height="8" rx="4" fill="#fff" fill-opacity=".25"/>
+        <circle cx="373" cy="370" r="6" fill="#6b4b0c"/>
+        <rect x="370.5" y="371" width="5" height="16" rx="2.5" fill="#6b4b0c"/>
+        <!-- tag on a string -->
+        <path d="M398 330 C430 340 444 368 452 392" fill="none" stroke="#f4efe8" stroke-width="2"/>
+        <g transform="rotate(14 470 412)">
+          <path d="M432 392 h100 a6 6 0 0 1 6 6 v30 a6 6 0 0 1 -6 6 h-100 l-14 -21 Z" fill="#faf9f5"/>
+          <circle cx="434" cy="413" r="3.5" fill="#c9bfb0"/>
+          <text x="445" y="420" fill="#1f1e1d" font-family="Instrument Serif, Georgia, serif" font-style="italic" font-size="21">verified</text>
+          <circle cx="526" cy="416" r="3.2" fill="#fc4109"/>
+        </g>
+        <!-- sparkles -->
+        <g fill="#faf9f5">
+          <path d="M214 146 l4 12 l12 4 l-12 4 l-4 12 l-4 -12 l-12 -4 l12 -4 Z"><animate attributeName="opacity" values="1;.2;1" dur="2.6s" repeatCount="indefinite"/></path>
+          <path d="M408 120 l3 9 l9 3 l-9 3 l-3 9 l-3 -9 l-9 -3 l9 -3 Z"><animate attributeName="opacity" values=".3;1;.3" dur="3.2s" repeatCount="indefinite"/></path>
+          <path d="M470 196 l2.5 7 l7 2.5 l-7 2.5 l-2.5 7 l-2.5 -7 l-7 -2.5 l7 -2.5 Z"><animate attributeName="opacity" values="1;.4;1" dur="2.1s" repeatCount="indefinite"/></path>
+        </g>
+      </symbol>
+
+      <!-- Margin: a tablet with a margin note and a pencil -->
+      <symbol id="art-margin" viewBox="0 0 600 560">
+        <use href="#plate"/>
+        <ellipse cx="300" cy="474" rx="170" ry="13" fill="#000" opacity=".28" filter="url(#softer)"/>
+        <g transform="rotate(-3 300 340)">
+          <path d="M250 455 L300 300 L350 455 Z" fill="#9d978e"/>
+          <rect x="128" y="208" width="344" height="252" rx="24" fill="url(#padFrame)"/>
+          <rect x="136" y="216" width="328" height="236" rx="17" fill="#1c1c1e"/>
+          <rect x="146" y="226" width="308" height="216" rx="9" fill="#fbfaf7"/>
+          <!-- page text -->
+          <g fill="#d4cec4">
+            <rect x="164" y="246" width="120" height="9" rx="4.5" fill="#1f1e1d" fill-opacity=".8"/>
+            <rect x="164" y="270" width="196" height="5" rx="2.5"/>
+            <rect x="164" y="284" width="182" height="5" rx="2.5"/>
+            <rect x="160" y="295" width="196" height="16" rx="3" fill="#f6d55c" fill-opacity=".75"/>
+            <rect x="164" y="300" width="176" height="5" rx="2.5" fill="#8e8778"/>
+            <rect x="164" y="320" width="190" height="5" rx="2.5"/>
+            <rect x="164" y="334" width="150" height="5" rx="2.5"/>
+            <rect x="164" y="356" width="196" height="5" rx="2.5"/>
+            <rect x="164" y="370" width="172" height="5" rx="2.5"/>
+            <rect x="164" y="384" width="186" height="5" rx="2.5"/>
+            <rect x="164" y="398" width="120" height="5" rx="2.5"/>
+          </g>
+          <path d="M368 226 V442" stroke="#ffb3cd" stroke-width="1.5"/>
+          <!-- the tutor's note in the margin -->
+          <text fill="#fc4109" font-family="Instrument Serif, Georgia, serif" font-style="italic" font-size="16">
+            <tspan x="375" y="256">what would</tspan>
+            <tspan x="375" y="274">you try</tspan>
+            <tspan x="375" y="292">first?</tspan>
+          </text>
+          <path d="M392 312 C388 330 372 312 361 304" fill="none" stroke="#fc4109" stroke-width="2" stroke-linecap="round"/>
+          <path d="M369 298 L360 304 L369 310" fill="none" stroke="#fc4109" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <rect x="384" y="408" width="56" height="20" rx="10" fill="#1d3fbf"/>
+          <text x="412" y="422" text-anchor="middle" fill="#faf9f5" font-family="Bricolage Grotesque, sans-serif" font-size="10" font-weight="600">hint</text>
+        </g>
+        <!-- pencil resting on the plate -->
+        <g transform="rotate(-11 300 486)">
+          <rect x="176" y="478" width="210" height="15" rx="2" fill="#f2b632"/>
+          <rect x="176" y="478" width="210" height="5" fill="#fff" fill-opacity=".25"/>
+          <rect x="160" y="478" width="18" height="15" rx="3" fill="#ffb3cd"/>
+          <rect x="174" y="478" width="8" height="15" fill="#bdb6aa"/>
+          <path d="M386 478 L414 485.5 L386 493 Z" fill="#f1dcc0"/>
+          <path d="M405 483 L414 485.5 L405 488 Z" fill="#2a2a2a"/>
+        </g>
+      </symbol>
+
+      <!-- Small sun-over-ridge badge, also the favicon -->
+      <symbol id="badge" viewBox="0 0 40 40">
+        <circle cx="20" cy="20" r="19" fill="#0f0f0e"/>
+        <path d="M3 25 C8 23 11 24 15 22.5 L19 23 L23 16.5 L26 20 L29 15 L33 21 L37 23" fill="none" stroke="#faf9f5" stroke-width="1.4" stroke-linejoin="round"/>
+        <circle cx="19" cy="21.5" r="3.4" fill="#fc4109"/>
+      </symbol>
+    </defs>
+  </svg>
+
+  <header class="hud" data-tone="light">
+    <a class="brand" href="#top" aria-label="Amir König, back to top">
+      <svg class="badge" viewBox="0 0 40 40" aria-hidden="true"><use href="#badge"/></svg>
+      <span class="brand-name">AMIR.md</span><span class="brand-dot" aria-hidden="true"></span>
+    </a>
+    <span class="hud-file" aria-hidden="true"><span class="hud-hash"></span><span class="hud-label"></span></span>
+    <nav class="hud-right" aria-label="Quick links">
+      <a class="hud-link" href="#contact">contact</a>
+      <button class="pill" type="button" aria-expanded="false" aria-controls="index">index <span class="burger" aria-hidden="true"></span></button>
+    </nav>
+  </header>
+
+  <nav class="rail" aria-label="Sections"></nav>
+  <div class="cursor" aria-hidden="true"></div>
+
+  <main>
+    <!-- [0] Hero -->
+    <section class="hero" id="top" data-tone="light" data-label="" data-name="top">
+      <canvas class="sky" data-base=".67" data-sun=".42" aria-hidden="true"></canvas>
+      <div class="hero-head">
+        <p class="eyebrow">Computer Science · ETH Zurich</p>
+        <h1 class="hero-title"><span class="l1">Amir</span> <span class="l2">König</span></h1>
+        <p class="hero-sub">product-minded software engineer</p>
+      </div>
+      <nav class="toc" aria-label="Contents">
+        <ol>
+          <li><a href="#hello"><span class="num">[1]</span><span class="lead"></span><span class="lbl">Introduction</span></a></li>
+          <li><a href="#projects"><span class="num">[2]</span><span class="lead"></span><span class="lbl">Projects</span></a></li>
+          <li><a href="#record"><span class="num">[3]</span><span class="lead"></span><span class="lbl">Record</span></a></li>
+          <li><a href="#leadership"><span class="num">[4]</span><span class="lead"></span><span class="lbl">Leadership</span></a></li>
+          <li><a href="#toolbox"><span class="num">[5]</span><span class="lead"></span><span class="lbl">Toolbox</span></a></li>
+          <li><a href="#contact"><span class="num">[6]</span><span class="lead"></span><span class="lbl">Availability</span></a></li>
+        </ol>
+      </nav>
+      <p class="scroll-hint" aria-hidden="true">scroll</p>
+    </section>
+
+    <!-- [1] Hello -->
+    <section class="pin field field-klein" id="hello" data-tone="light" data-label="hello" data-name="Introduction" data-hash="##">
+      <div class="pin-stage">
+        <p class="md-h"><span class="hash">##</span> hello</p>
+        <h2 class="hello-big">Hello<span class="dot">.</span></h2>
+        <p class="hello-copy" data-words>I’m Amir. I take ideas from user research to <em>live systems.</em> Twelve years of school in Abu Dhabi, now computer science in Zurich. Native in English, German and Arabic.</p>
+      </div>
+    </section>
+
+    <!-- [2] Projects -->
+    <section class="reading" id="projects" data-tone="dark" data-label="projects" data-name="Projects" data-hash="##">
+      <div class="col">
+        <p class="eyebrow-n rv"><span class="num">[2]</span> Projects</p>
+        <h2 class="rv">Three products, built in 2026</h2>
+        <p class="lede rv">A live early-warning app I built solo, a private code platform with formally verified security rules, and an AI study app my team shaped through 16 interviews with students from 10 universities.</p>
+        <p class="rv">Each one starts with what people actually need and ends in working software. I build with AI coding agents and say so plainly: it lets one person ship what used to take a team.</p>
+      </div>
+    </section>
+
+    <section class="field project" id="ews" style="--bg: var(--sky)" data-tone="dark" data-label="1. EWS" data-name="EWS" data-hash="###">
+      <div class="project-inner">
+        <div class="project-text">
+          <p class="md-h rv"><span class="hash">###</span> 1. the early-warning app</p>
+          <h3 class="project-name rv">EWS</h3>
+          <p class="project-line rv">Live alerts, risk scores and travel advisories for the Middle East and Europe, <em>on your iPhone.</em></p>
+          <ul class="md-list rv">
+            <li><b>role</b> creator and developer</li>
+            <li><b>built</b> solo, in seven months</li>
+            <li><b>with</b> Swift, Python and AI coding agents</li>
+            <li><b>since</b> April 2026</li>
+          </ul>
+        </div>
+        <figure class="project-art rv">
+          <svg viewBox="0 0 600 560" role="img" aria-label="A phone on a plate showing an EWS alert and a live radar"><use href="#art-ews"/></svg>
+        </figure>
+      </div>
+    </section>
+
+    <section class="field project flip" id="gitbox" style="--bg: var(--lilac)" data-tone="dark" data-label="2. Gitbox" data-name="Gitbox" data-hash="###">
+      <div class="project-inner">
+        <div class="project-text">
+          <p class="md-h rv"><span class="hash">###</span> 2. the private code platform</p>
+          <h3 class="project-name rv">Gitbox</h3>
+          <p class="project-line rv">An in-house GitHub alternative for team projects, with secure logins, a web dashboard and core security rules <em>formally verified.</em></p>
+          <ul class="md-list rv">
+            <li><b>role</b> creator and developer</li>
+            <li><b>with</b> Rust and Lean 4, written by AI agents I directed</li>
+            <li><b>for</b> our own teams, kept in-house</li>
+            <li><b>when</b> November 2026</li>
+          </ul>
+        </div>
+        <figure class="project-art rv">
+          <svg viewBox="0 0 600 560" role="img" aria-label="A blue box with a gold padlock and a tag that reads verified"><use href="#art-gitbox"/></svg>
+        </figure>
+      </div>
+    </section>
+
+    <section class="field project" id="margin" style="--bg: var(--olive)" data-tone="dark" data-label="3. Margin" data-name="Margin" data-hash="###">
+      <div class="project-inner">
+        <div class="project-text">
+          <p class="md-h rv"><span class="hash">###</span> 3. the study app</p>
+          <h3 class="project-name rv">Margin</h3>
+          <p class="project-line rv">A native Mac and iPad study app with an AI tutor that <em>guides rather than answers.</em></p>
+          <ul class="md-list rv">
+            <li><b>role</b> developer, in a team of six</li>
+            <li><b>for</b> ETH’s Human-Computer Interaction course</li>
+            <li><b>research</b> 16 interviews with students from 10 universities, plus usability testing</li>
+            <li><b>since</b> September 2026</li>
+          </ul>
+        </div>
+        <figure class="project-art rv">
+          <svg viewBox="0 0 600 560" role="img" aria-label="A tablet with a note in the margin asking: what would you try first?"><use href="#art-margin"/></svg>
+        </figure>
+      </div>
+    </section>
+
+    <!-- [3] Record -->
+    <section class="reading" id="record" data-tone="dark" data-label="record" data-name="Record" data-hash="##">
+      <div class="col">
+        <p class="eyebrow-n rv"><span class="num">[3]</span> Record</p>
+        <h2 class="rv">Education and experience</h2>
+        <p class="lede rv">Computer science at ETH Zurich, after a German International Abitur in Abu Dhabi. Teaching in between.</p>
+      </div>
+      <figure class="bench-wrap rv">
+        <table class="bench">
+          <thead>
+            <tr><th scope="col"><span class="vh">Area</span></th><th scope="col" class="hl">Role</th><th scope="col">Where</th><th scope="col">When</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row"><span class="cat">Education</span><span class="sub">University</span></th>
+              <td class="hl">BSc Computer Science<span class="q">Algorithms, Computer Networks, Computer Architecture, Human-Computer Interaction</span></td>
+              <td>ETH Zurich</td>
+              <td class="when">Sep 2023 – present</td>
+            </tr>
+            <tr>
+              <th scope="row"><span class="cat">Education</span><span class="sub">School</span></th>
+              <td class="hl">German International Abitur, grade 1.4<span class="q">ADEK Top Ranked Student in the UAE · best Arabic state exam result in class</span></td>
+              <td>German International School Abu Dhabi</td>
+              <td class="when">2011 – 2023</td>
+            </tr>
+            <tr>
+              <th scope="row"><span class="cat">Experience</span><span class="sub">Teaching</span></th>
+              <td class="hl">Teaching Assistant, Digital Design and Computer Architecture<span class="q">Four lab sessions a week, 10 to 60 students each, and their lab reports</span></td>
+              <td>ETH Zurich</td>
+              <td class="when">Mar – Jul 2026</td>
+            </tr>
+            <tr>
+              <th scope="row"><span class="cat">Experience</span><span class="sub">Placements</span></th>
+              <td class="hl">Management placements<span class="q">One-week rotations across factory management, guest relations and hospitality operations</span></td>
+              <td>Saertex MultiCom · InterContinental Abu Dhabi</td>
+              <td class="when">2021 – 2022</td>
+            </tr>
+          </tbody>
+        </table>
+        <figcaption>Full CV on request: <a href="mailto:amir.koenig@proton.me">email me</a>.</figcaption>
+      </figure>
+    </section>
+
+    <!-- [4] Leadership -->
+    <section class="field lead-scene" id="leadership" style="--bg: var(--pink)" data-tone="dark" data-label="leadership" data-name="Leadership" data-hash="##">
+      <div class="lead-inner">
+        <p class="md-h rv"><span class="hash">##</span> leadership</p>
+        <p class="giant rv" aria-label="400 plus">400<span class="plus">+</span></p>
+        <p class="giant-cap rv">students represented as Student Government President. <em>Plus six years as Class President.</em></p>
+        <ul class="strips">
+          <li class="rv">Took digital learning from a one-class pilot to the entire primary school</li>
+          <li class="rv">Led the equality and fairness team and opened a channel for bullied students to reach staff</li>
+          <li class="rv">Selected to welcome Angela Merkel to the UAE</li>
+          <li class="rv">Student liaison to the German Ambassador</li>
+          <li class="rv">Selected to represent Mongolia as a student ambassador at WorldSkills Abu Dhabi</li>
+          <li class="rv">Zurich Model United Nations: the UAE in the WHO committee, co-author of a position paper on pandemic prevention</li>
+          <li class="rv">Semester Representative at ETH Zurich</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- [5] Toolbox -->
+    <section class="field toolbox" id="toolbox" style="--bg: var(--cream)" data-tone="dark" data-label="toolbox" data-name="Toolbox" data-hash="##">
+      <div class="tool-inner">
+        <p class="md-h rv"><span class="hash">##</span> toolbox</p>
+        <ul class="dash-list">
+          <li class="rv">I write <strong>Python, Java, C, Swift and Verilog</strong></li>
+          <li class="rv">I work in <strong>Git, Linux, LaTeX and Figma</strong></li>
+          <li class="rv">I design through <strong>user research, prototyping and usability testing</strong></li>
+          <li class="rv">I direct <strong>AI coding agents</strong>, end to end</li>
+        </ul>
+        <ul class="hellos" aria-label="Languages">
+          <li class="rv"><span class="word" lang="en">Hello</span><span class="cap">English · native</span></li>
+          <li class="rv"><span class="word" lang="de">Hallo</span><span class="cap">German · native</span></li>
+          <li class="rv"><span class="word" lang="ar" dir="rtl">مرحبا</span><span class="cap">Arabic · native</span></li>
+          <li class="rv"><span class="word" lang="fr">Bonjour</span><span class="cap">French · B1</span></li>
+        </ul>
+        <p class="offscreen rv"><span class="mono">&gt; off-screen:</span> karate (brown belt, 1st place at the Abu Dhabi championship) and photography.</p>
+      </div>
+    </section>
+
+    <!-- [6] Availability -->
+    <section class="outro" id="contact" data-tone="light" data-label="availability" data-name="Availability" data-hash="##">
+      <canvas class="sky" data-base=".86" data-sun=".7" data-variant="dusk" aria-hidden="true"></canvas>
+      <div class="outro-copy">
+        <p class="eyebrow-n rv"><span class="num">[6]</span> Availability</p>
+        <h2 class="rv">Open to internships in software engineering, product and consulting.</h2>
+        <p class="rv">Based in Zurich. The quickest way to reach me is email.</p>
+        <a class="mail rv" href="mailto:amir.koenig@proton.me">amir.koenig@proton.me</a>
+        <ul class="links rv">
+          <li><a href="https://www.linkedin.com/in/amir-konig" rel="me noopener" target="_blank">LinkedIn <span aria-hidden="true">↗</span></a></li>
+        </ul>
+      </div>
+      <footer class="foot">
+        <span>© 2026 Amir König</span><span>Zurich</span><span>Updated November 2026</span>
+      </footer>
+    </section>
+  </main>
+
+  <!-- Index overlay: one card per section -->
+  <div class="index" id="index" role="dialog" aria-modal="true" aria-label="Index" hidden>
+    <ol class="cards">
+      <li><a href="#hello" style="--r:-5deg"><span class="card-art" style="--c:var(--klein)"><span class="mini-hello">Hello<i>.</i></span></span><span class="n">1</span><span class="t">hello</span></a></li>
+      <li><a href="#ews" style="--r:3deg"><span class="card-art" style="--c:var(--sky)"><svg viewBox="60 40 480 500" aria-hidden="true"><use href="#art-ews"/></svg></span><span class="n">2</span><span class="t">EWS</span></a></li>
+      <li><a href="#gitbox" style="--r:-2deg"><span class="card-art" style="--c:var(--lilac)"><svg viewBox="60 60 480 480" aria-hidden="true"><use href="#art-gitbox"/></svg></span><span class="n">3</span><span class="t">Gitbox</span></a></li>
+      <li><a href="#margin" style="--r:4deg"><span class="card-art" style="--c:var(--olive)"><svg viewBox="60 100 480 440" aria-hidden="true"><use href="#art-margin"/></svg></span><span class="n">4</span><span class="t">Margin</span></a></li>
+      <li><a href="#record" style="--r:-3deg"><span class="card-art" style="--c:var(--ivory)"><span class="mini-table"><i></i><i></i><i></i><i></i></span></span><span class="n">5</span><span class="t">record</span></a></li>
+      <li><a href="#leadership" style="--r:2deg"><span class="card-art" style="--c:var(--pink)"><span class="mini-400">400+</span></span><span class="n">6</span><span class="t">leadership</span></a></li>
+      <li><a href="#toolbox" style="--r:-4deg"><span class="card-art" style="--c:var(--cream)"><span class="mini-hallo">Hallo</span></span><span class="n">7</span><span class="t">toolbox</span></a></li>
+      <li><a href="#contact" style="--r:5deg"><span class="card-art" style="--c:var(--night)"><svg viewBox="0 0 40 40" aria-hidden="true" class="mini-badge"><use href="#badge"/></svg></span><span class="n">8</span><span class="t">availability</span></a></li>
+    </ol>
+  </div>
+
+  <script src="assets/site.js" defer></script>
+</body>
+</html>
